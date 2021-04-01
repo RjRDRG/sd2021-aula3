@@ -1,9 +1,11 @@
 package sd2021.aula3.server.resources;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.WebApplicationException;
@@ -14,7 +16,7 @@ import sd2021.aula3.api.service.RestUsers;
 @Singleton
 public class UsersResource implements RestUsers {
 
-	private final Map<String,User> users = new HashMap<String, User>();
+	private final Map<String,User> users = new HashMap<>();
 
 	private static Logger Log = Logger.getLogger(UsersResource.class.getName());
 
@@ -42,10 +44,9 @@ public class UsersResource implements RestUsers {
 
 			//Add the user to the map of users
 			users.put(user.getUserId(), user);
-			
+
+			return user.getUserId();
 		}
-		
-		return user.getUserId();
 	}
 
 
@@ -59,12 +60,7 @@ public class UsersResource implements RestUsers {
 			throw new WebApplicationException( Status.CONFLICT );
 		}
 
-		User user = null;
-		
-		synchronized (this) {
-			user = users.get(userId);
-		}
-		 
+		User user = users.get(userId);
 
 		// Check if user exists 
 		if( user == null ) {
@@ -85,24 +81,78 @@ public class UsersResource implements RestUsers {
 	@Override
 	public User updateUser(String userId, String password, User user) {
 		Log.info("updateUser : user = " + userId + "; pwd = " + password + " ; user = " + user);
-		// TODO Complete method
-		return null;
+
+		// Check if user is valid, if not return HTTP CONFLICT (409)
+		if(userId == null || password == null) {
+			Log.info("UserId or passwrod null.");
+			throw new WebApplicationException( Status.CONFLICT );
+		}
+
+		synchronized ( this ) {
+			User oldUser = users.get(userId);
+
+			// Check if user exists
+			if( oldUser == null ) {
+				Log.info("User does not exist.");
+				throw new WebApplicationException( Status.NOT_FOUND );
+			}
+
+			//Check if the password is correct
+			if( !oldUser.getPassword().equals( password)) {
+				Log.info("Password is incorrect.");
+				throw new WebApplicationException( Status.FORBIDDEN );
+			}
+
+			users.put(userId, new User(userId, user.getFullName(), user.getEmail(), user.getPassword()));
+
+			return oldUser;
+		}
 	}
 
 
 	@Override
 	public User deleteUser(String userId, String password) {
 		Log.info("deleteUser : user = " + userId + "; pwd = " + password);
-		// TODO Complete method
-		return null;
+
+		// Check if user is valid, if not return HTTP CONFLICT (409)
+		if(userId == null || password == null) {
+			Log.info("UserId or password null.");
+			throw new WebApplicationException( Status.CONFLICT );
+		}
+
+		synchronized ( this ) {
+			User user = users.get(userId);
+
+			// Check if user exists
+			if (user == null) {
+				Log.info("User does not exist.");
+				throw new WebApplicationException(Status.NOT_FOUND);
+			}
+
+			//Check if the password is correct
+			if (!user.getPassword().equals(password)) {
+				Log.info("Password is incorrect.");
+				throw new WebApplicationException(Status.FORBIDDEN);
+			}
+
+			return users.remove(userId);
+		}
 	}
 
 
 	@Override
 	public List<User> searchUsers(String pattern) {
 		Log.info("searchUsers : pattern = " + pattern);
-		// TODO Complete method
-		return null;
+
+		if(users.isEmpty()) {
+			return new ArrayList<>();
+		}
+
+		if( pattern == null || pattern.isEmpty() ) {
+			return new ArrayList<>(users.values());
+		}
+
+		return users.values().stream().filter(u -> u.getFullName().contains(pattern)).collect(Collectors.toList());
 	}
 
 }

@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
+import sd2021.aula3.discovery.Discovery;
 import sd2021.aula3.server.resources.UsersResource;
 
 public class UsersServer {
@@ -30,7 +31,10 @@ public class UsersServer {
 
 		String serverURI = String.format("http://%s:%s/rest", ip, PORT);
 		JdkHttpServerFactory.createHttpServer( URI.create(serverURI), config);
-	
+
+		Discovery discovery = new Discovery( SERVICE, serverURI);
+		discovery.startSendingAnnouncements();
+
 		Log.info(String.format("%s Server ready @ %s\n",  SERVICE, serverURI));
 		
 		//More code can be executed here...

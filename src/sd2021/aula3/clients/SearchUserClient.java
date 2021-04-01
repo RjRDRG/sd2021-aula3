@@ -1,6 +1,7 @@
 package sd2021.aula3.clients;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.List;
 
 import jakarta.ws.rs.ProcessingException;
@@ -17,6 +18,8 @@ import org.glassfish.jersey.client.ClientProperties;
 
 import sd2021.aula3.api.User;
 import sd2021.aula3.api.service.RestUsers;
+import sd2021.aula3.discovery.Discovery;
+import sd2021.aula3.server.UsersServer;
 
 public class SearchUserClient {
 
@@ -32,8 +35,11 @@ public class SearchUserClient {
 			return;
 		}
 
-		String serverUrl = args[0];
-		String query = args[1];
+		Discovery discovery = new Discovery( "SearchUserClient", "http://" + InetAddress.getLocalHost().getHostAddress());
+		discovery.startCollectingAnnouncements();
+
+		String serverUrl = discovery.knownUrisOf(UsersServer.SERVICE).iterator().next().toString();
+		String query = args[0];
 
 		System.out.println("Sending request to server.");
 

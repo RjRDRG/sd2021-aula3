@@ -1,6 +1,7 @@
 package sd2021.aula3.clients;
 
 import java.io.IOException;
+import java.net.InetAddress;
 
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.Client;
@@ -16,6 +17,8 @@ import org.glassfish.jersey.client.ClientProperties;
 
 import sd2021.aula3.api.User;
 import sd2021.aula3.api.service.RestUsers;
+import sd2021.aula3.discovery.Discovery;
+import sd2021.aula3.server.UsersServer;
 
 public class UpdateUserClient {
 
