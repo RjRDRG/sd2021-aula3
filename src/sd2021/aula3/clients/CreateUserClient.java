@@ -32,7 +32,7 @@ public class CreateUserClient {
 
 		if( args.length != 4) {
 			System.err.println( "Use: java sd2021.aula2.clients.CreateUserClient userId fullName email password");
-			return;
+			return; //dsasd
 		}
 
 		String serverUrl = args[0];
