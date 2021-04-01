@@ -19,7 +19,7 @@ import sd2021.aula3.api.service.RestUsers;
 
 public class CreateUserClient {
 
-
+//asdajshfpuasjçodi
 	public final static int MAX_RETRIES = 3;
 	public final static long RETRY_PERIOD = 1000;
 	public final static int CONNECTION_TIMEOUT = 1000;
